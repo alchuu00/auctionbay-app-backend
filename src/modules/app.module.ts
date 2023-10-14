@@ -15,7 +15,7 @@ import { UsersModule } from 'src/users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
       // which .env file it reads
-      envFilePath: [`.env.${process.env.STAGE}`],
+      envFilePath: [`vars/.env.${process.env.STAGE}`],
       validationSchema: configValidationSchema,
     }),
     DatabaseModule,

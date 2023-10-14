@@ -11,8 +11,8 @@ import {
   Body,
   Patch,
   Delete,
-  Res,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -26,7 +26,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
-import { Observable, tap, map, of } from 'rxjs';
+import {
+  saveImageToStorage,
+  isFileExtensionSafe,
+  removeFile,
+} from 'src/helpers/imageStorage';
 
 @ApiTags('users')
 @Controller('users')
@@ -34,6 +38,7 @@ import { Observable, tap, map, of } from 'rxjs';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // handle GET request to retrieve a paginated list of users
   @ApiCreatedResponse({ description: 'List all users.' })
   @ApiBadRequestResponse({ description: 'Error for list of users.' })
   @Get()
@@ -42,12 +47,14 @@ export class UsersController {
     return this.usersService.paginate(page);
   }
 
+  // handle GET request to retrieve a user with a specific id
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findById(id);
   }
 
+  // handle POST request to create a new user
   @ApiCreatedResponse({ description: 'Creates new user.' })
   @ApiBadRequestResponse({ description: 'Error for creating a new user.' })
   @Post()
@@ -55,30 +62,35 @@ export class UsersController {
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
-  // upload avatar image
+
+  // handle POST request to upload avatar image
   @Post('upload/:id')
-  @UseInterceptors(FileInterceptor('file', storage))
-  uploadFile(@UploadedFile() file, @Request() req): Observable<Object> {
-    const user: User = req.user;
+  @UseInterceptors(FileInterceptor('avatar', saveImageToStorage))
+  @HttpCode(HttpStatus.CREATED)
+  async upload(
+    @UploadedFile() file: Express.Multer.File, // Extract the uploaded file from the request
+    @Param('id') id: string, // Extract the user ID from the request URL
+  ): Promise<User> {
+    const filename = file?.filename; // Extract the filename of the uploaded file from the file object
 
-    return this.userService
-      .updateOne(user.id, { profileImage: file.filename })
-      .pipe(
-        tap((user: User) => console.log(user)),
-        map((user: User) => ({ profileImage: user.profileImage })),
-      );
+    if (!filename) {
+      // Throw a BadRequestException if the uploaded file does not have a valid filename
+      throw new BadRequestException('File must be a png, jpg/jpeg');
+    }
+
+    const imagesFolderPath = join(process.cwd(), 'files'); // Define the path to the folder where uploaded images will be stored
+    const fullImagePath = join(imagesFolderPath + '/' + file.filename); // Define the full path to the uploaded image file
+
+    if (await isFileExtensionSafe(fullImagePath)) {
+      // Check if the uploaded file has a safe file extension
+      return this.usersService.updateUserImageId(id, filename); // Call the updateUserImageId method of the usersService instance to update the user's avatar image ID in the database
+    }
+
+    removeFile(fullImagePath); // Remove the uploaded file from the file system if it does not have a safe file extension
+    throw new BadRequestException('File content does not match extension!'); // Throw a BadRequestException if the uploaded file does not have a safe file extension
   }
 
-  @Get('profile-image/:imagename')
-  findProfileImage(
-    @Param('imagename') imagename,
-    @Res() res,
-  ): Observable<Object> {
-    return of(
-      res.sendFile(join(process.cwd(), 'uploads/profileimages/' + imagename)),
-    );
-  }
-
+  // handle PATCH request to update user information
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(
@@ -88,6 +100,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  // handle DELETE request to delete a user with a specific id
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<User> {

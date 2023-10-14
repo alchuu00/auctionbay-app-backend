@@ -1,21 +1,22 @@
+const FileType = import('file-type');
 import fs from 'fs';
 import Logging from 'src/library/Logging';
 import { diskStorage, Options } from 'multer';
 import { extname } from 'path';
 
-type validFileExtensionsType = 'png' | 'jpg' | 'jpeg'; // Define a type for valid file extensions
-type validMimeType = 'image/png' | 'image/jpg' | 'image/jpeg'; // Define a type for valid MIME types
+type validFileExtensionsType = 'png' | 'jpg' | 'jpeg';
+type validMimeType = 'image/png' | 'image/jpg' | 'image/jpeg';
 
-const validFileExtensions: validFileExtensionsType[] = ['png', 'jpg', 'jpeg']; // Define an array of valid file extensions
+const validFileExtensions: validFileExtensionsType[] = ['png', 'jpg', 'jpeg'];
 const validMimeTypes: validMimeType[] = [
   'image/png',
   'image/jpg',
   'image/jpeg',
-]; // Define an array of valid MIME types
+];
 
 export const saveImageToStorage: Options = {
   storage: diskStorage({
-    destination: './files', // Define the destination folder for uploaded files
+    destination: './files',
     filename(req, file, callback) {
       // Create unique suffix
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -24,7 +25,7 @@ export const saveImageToStorage: Options = {
       // Write filename
       const filename = `${uniqueSuffix}${ext}`;
 
-      callback(null, filename); // Call the callback function with the filename
+      callback(null, filename);
     },
   }),
   fileFilter(req, file, callback) {
@@ -38,24 +39,26 @@ export const saveImageToStorage: Options = {
 export const isFileExtensionSafe = async (
   fullFilePath: string,
 ): Promise<boolean> => {
-  const { fileTypeFromFile } = await import('file-type'); // Dynamically import the fileTypeFromFile function from the file-type package
-  const fileTypeInfo = await fileTypeFromFile(fullFilePath); // Get the file type information for the given file path
-  if (!fileTypeInfo) return false; // Return false if the file type information is not available
+  const fileType = await import('file-type');
 
-  const isFileTypeLegit = validFileExtensions.includes(
-    fileTypeInfo.ext as validFileExtensionsType,
-  ); // Check if the file extension is valid
-  const isMimeTypeLegit = validMimeTypes.includes(
-    fileTypeInfo.mime as validMimeType,
-  ); // Check if the MIME type is valid
-  const isFileLegit = isFileTypeLegit && isMimeTypeLegit; // Check if both the file extension and MIME type are valid
-  return isFileLegit; // Return whether the file extension and MIME type are valid
+  return fileType.fromFile(fullFilePath).then((fileExtensionAndMimeType) => {
+    if (!fileExtensionAndMimeType?.ext) return false;
+
+    const isFileTypeLegit = validFileExtensions.includes(
+      fileExtensionAndMimeType.ext as validFileExtensionsType,
+    );
+    const isMimeTypeLegit = validMimeTypes.includes(
+      fileExtensionAndMimeType.mime as validMimeType,
+    );
+    const isFileLegit = isFileTypeLegit && isMimeTypeLegit;
+    return isFileLegit;
+  });
 };
 
 export const removeFile = (fullFilePath: string): void => {
   try {
-    fs.unlinkSync(fullFilePath); // Remove the file from the file system
+    fs.unlinkSync(fullFilePath);
   } catch (error) {
-    Logging.error(error); // Log any errors that occur during file removal
+    Logging.error(error);
   }
 };

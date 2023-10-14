@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { configValidationSchema } from 'src/config/schema.config';
 import { DatabaseModule } from './database/database.module';
 import { LoggerMiddleware } from 'src/middleware/logger.middleware';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [

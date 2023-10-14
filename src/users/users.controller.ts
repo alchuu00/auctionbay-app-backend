@@ -32,10 +32,9 @@ export class UsersController {
   @ApiCreatedResponse({ description: 'List all users.' })
   @ApiBadRequestResponse({ description: 'Error for list of users.' })
   @Get()
-  // @HasPermissions('role')
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('page') page: number): Promise<PaginatedResult> {
-    return this.usersService.paginate(page, ['role']);
+    return this.usersService.paginate(page);
   }
 
   @Get(':id')

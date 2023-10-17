@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 import { Base } from './base.entity';
+import { Bid } from './bid.entity';
 
 @Entity()
 export class User extends Base {
@@ -20,4 +21,7 @@ export class User extends Base {
   @Column({ nullable: true })
   @Exclude()
   password: string;
+
+  @OneToMany(() => Bid, (bid) => bid.bidder, { eager: true })
+  bids: Bid[];
 }

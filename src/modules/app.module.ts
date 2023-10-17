@@ -9,6 +9,8 @@ import { configValidationSchema } from 'src/config/schema.config';
 import { DatabaseModule } from './database/database.module';
 import { LoggerMiddleware } from 'src/middleware/logger.middleware';
 import { UsersModule } from './users/users.module';
+import { AuctionItemsModule } from './auctionItems/auctionItems.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,10 +21,11 @@ import { UsersModule } from './users/users.module';
       validationSchema: configValidationSchema,
     }),
     DatabaseModule,
+    AuthModule,
     UsersModule,
+    AuctionItemsModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule implements NestModule {
   // Logger for console.log routes and urls

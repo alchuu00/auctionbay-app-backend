@@ -22,6 +22,6 @@ export class User extends Base {
   @Exclude()
   password: string;
 
-  @OneToMany(() => Bid, (bid) => bid.bidder, { eager: true })
+  @OneToMany(() => Bid, (bid) => bid.bidder)
   bids: Bid[];
 }

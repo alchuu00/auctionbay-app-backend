@@ -24,7 +24,7 @@ export class AuctionItem extends Base {
   @OneToMany(() => Bid, (bid) => bid.auction_item, { eager: true })
   bids: Bid[];
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

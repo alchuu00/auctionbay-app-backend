@@ -15,4 +15,5 @@ export class Bid extends Base {
   @ManyToOne(() => AuctionItem, { eager: true })
   @JoinColumn({ name: 'auction_item_id' })
   auction_item: AuctionItem;
+  bid: { id: string };
 }

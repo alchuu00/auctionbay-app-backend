@@ -11,6 +11,7 @@ import { LoggerMiddleware } from 'src/middleware/logger.middleware';
 import { UsersModule } from './users/users.module';
 import { AuctionItemsModule } from './auctionItems/auctionItems.module';
 import { AuthModule } from './auth/auth.module';
+import { BidsModule } from './bids/bids.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
     UsersModule,
     AuctionItemsModule,
+    BidsModule,
   ],
   controllers: [],
 })

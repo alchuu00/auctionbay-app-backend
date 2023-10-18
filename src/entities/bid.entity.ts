@@ -8,11 +8,11 @@ export class Bid extends Base {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   bid_amount: number;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   bidder: User;
 
-  @ManyToOne(() => AuctionItem, { eager: true })
+  @ManyToOne(() => AuctionItem)
   @JoinColumn({ name: 'auction_item_id' })
   auction_item: AuctionItem;
   bid: { id: string };

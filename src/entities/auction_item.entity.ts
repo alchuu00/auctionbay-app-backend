@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Base } from './base.entity';
 import { Bid } from './bid.entity';
 import { User } from './user.entity';
+import { IsOptional } from 'class-validator';
 
 @Entity()
 export class AuctionItem extends Base {
@@ -12,8 +13,8 @@ export class AuctionItem extends Base {
   @Column({ nullable: true })
   description: string;
 
-  @Column()
-  image: string;
+  @Column({ nullable: true })
+  image?: string;
 
   @Column({ nullable: true })
   start_price: number;

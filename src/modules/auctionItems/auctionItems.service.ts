@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,7 +9,6 @@ import { AbstractService } from '../common/abstract.service';
 import Logging from 'src/library/Logging';
 import { CreateUpdateAuctionItemDto } from './dto/createUpdateAuctionItem.dto';
 import { AuctionItem } from 'src/entities/auction_item.entity';
-import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class AuctionItemsService extends AbstractService {

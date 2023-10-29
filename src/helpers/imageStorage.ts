@@ -1,8 +1,9 @@
-const FileType = import('file-type');
+import { FileTypeResult } from 'file-type';
 import fs from 'fs';
-import Logging from 'src/library/Logging';
 import { diskStorage, Options } from 'multer';
 import { extname } from 'path';
+import Logging from 'src/library/Logging';
+import FileType from 'file-type';
 
 type validFileExtensionsType = 'png' | 'jpg' | 'jpeg';
 type validMimeType = 'image/png' | 'image/jpg' | 'image/jpeg';
@@ -39,20 +40,14 @@ export const saveImageToStorage: Options = {
 export const isFileExtensionSafe = async (
   fullFilePath: string,
 ): Promise<boolean> => {
-  const fileType = await import('file-type');
-
-  return fileType.fromFile(fullFilePath).then((fileExtensionAndMimeType) => {
-    if (!fileExtensionAndMimeType?.ext) return false;
-
-    const isFileTypeLegit = validFileExtensions.includes(
-      fileExtensionAndMimeType.ext as validFileExtensionsType,
-    );
-    const isMimeTypeLegit = validMimeTypes.includes(
-      fileExtensionAndMimeType.mime as validMimeType,
-    );
-    const isFileLegit = isFileTypeLegit && isMimeTypeLegit;
-    return isFileLegit;
-  });
+  const fileType: FileTypeResult | undefined = await FileType.fromFile(
+    fullFilePath,
+  );
+  if (!fileType) {
+    return false;
+  }
+  const fileExtension: string = fileType.ext;
+  return validFileExtensions.includes(fileExtension as validFileExtensionsType);
 };
 
 export const removeFile = (fullFilePath: string): void => {

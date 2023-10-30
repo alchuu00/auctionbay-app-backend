@@ -41,7 +41,6 @@ export class AuctionItemsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('page') page: number): Promise<PaginatedResult> {
-    console.log('paginate auction items');
     return this.auctionItemsService.paginate(page);
   }
 
@@ -65,7 +64,7 @@ export class AuctionItemsController {
 
   // handle POST request to upload auction item image
   @Post('upload/:id')
-  @UseInterceptors(FileInterceptor('image', { storage: saveImageToStorage }))
+  @UseInterceptors(FileInterceptor('image', saveImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File, // Extract the uploaded file from the request

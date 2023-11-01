@@ -9,22 +9,29 @@ import { AbstractService } from '../common/abstract.service';
 import Logging from 'src/library/Logging';
 import { CreateUpdateAuctionItemDto } from './dto/createUpdateAuctionItem.dto';
 import { AuctionItem } from 'src/entities/auction_item.entity';
+import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class AuctionItemsService extends AbstractService {
   constructor(
     @InjectRepository(AuctionItem)
     private readonly auctionItemsRepository: Repository<AuctionItem>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {
     super(auctionItemsRepository);
   }
 
   async create(
     createAuctionItemDto: CreateUpdateAuctionItemDto,
+    userId: string,
   ): Promise<AuctionItem> {
     try {
-      const auctionItem =
-        this.auctionItemsRepository.create(createAuctionItemDto);
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      const auctionItem = this.auctionItemsRepository.create({
+        ...createAuctionItemDto,
+        user: user,
+      });
       return this.auctionItemsRepository.save(auctionItem);
     } catch (error) {
       Logging.error(error);

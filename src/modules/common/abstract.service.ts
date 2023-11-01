@@ -71,9 +71,9 @@ export abstract class AbstractService {
 
     try {
       const [data, total] = await this.repository.findAndCount({
-        take,
-        skip: (page - 1) * take,
-        relations,
+        relations: ['user'],
+        skip: (page - 1) * 10,
+        take: 10,
       });
 
       return {

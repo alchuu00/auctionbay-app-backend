@@ -20,6 +20,11 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { User } from 'src/entities/user.entity';
 import { RequestWithUser } from 'src/interfaces/auth.interface';
 
+interface LoginResponse {
+  user: User;
+  access_token: string;
+}
+
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
@@ -39,10 +44,11 @@ export class AuthController {
   async login(
     @Req() req: RequestWithUser,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<User> {
+  ): Promise<LoginResponse> {
     const access_token = await this.authService.generateJwt(req.user);
     res.cookie('access_token', access_token, { httpOnly: true });
-    return req.user;
+    res.cookie('user_id', req.user.id);
+    return { user: req.user, access_token };
   }
 
   @Get()
@@ -56,5 +62,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   signout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token');
+    res.clearCookie('user_id');
   }
 }

@@ -9,9 +9,7 @@ import {
 } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { Bid } from 'src/entities/bid.entity';
-import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('users')
 @Controller('bids')
 @UseInterceptors(ClassSerializerInterceptor)
 export class BidsController {
@@ -43,9 +41,9 @@ export class BidsController {
 
   // handle GET request to retrieve the winning bid for a specific auction item
   @Get(':auctionItemId/winning-bid')
-  async getWinningBid(
+  async getHighestBidder(
     @Param('auctionItemId') auctionItemId: string,
   ): Promise<Bid> {
-    return await this.bidsService.getWinningBid(auctionItemId);
+    return await this.bidsService.getHighestBidder(auctionItemId);
   }
 }

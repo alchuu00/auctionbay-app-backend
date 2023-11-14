@@ -9,5 +9,6 @@ import { User } from 'src/entities/user.entity';
   imports: [TypeOrmModule.forFeature([AuctionItem, User])],
   controllers: [AuctionItemsController],
   providers: [AuctionItemsService],
+  exports: [AuctionItemsService],
 })
 export class AuctionItemsModule {}

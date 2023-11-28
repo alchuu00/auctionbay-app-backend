@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from 'src/entities/token.entity';
 import sendResetEmail from 'src/utils/sendResetEmail';
 import { Repository } from 'typeorm';
-import bcrypt from 'bcrypt';
-import { template } from 'handlebars';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -33,7 +31,14 @@ export class TokenService {
     userId?: string;
   }): Promise<Token> {
     const token = this.tokenRepository.create(data);
-    return this.tokenRepository.save(token);
+    const savedToken = await this.tokenRepository.save(token);
+
+    // Delete the token after 1 hour
+    setTimeout(() => {
+      this.deleteOne({ token: savedToken.token });
+    }, 3600000);
+
+    return savedToken;
   }
 
   async resetPassword(userId, token, updateUserDto) {

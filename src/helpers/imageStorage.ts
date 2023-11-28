@@ -1,9 +1,7 @@
-import { FileTypeResult } from 'file-type';
 import fs from 'fs';
 import { diskStorage, Options } from 'multer';
 import { extname } from 'path';
 import Logging from 'src/library/Logging';
-import FileType from 'file-type';
 
 type validFileExtensionsType = 'png' | 'jpg' | 'jpeg';
 type validMimeType = 'image/png' | 'image/jpg' | 'image/jpeg';
@@ -40,9 +38,8 @@ export const saveImageToStorage: Options = {
 export const isFileExtensionSafe = async (
   fullFilePath: string,
 ): Promise<boolean> => {
-  const fileType: FileTypeResult | undefined = await FileType.fromFile(
-    fullFilePath,
-  );
+  const { fileTypeFromFile } = await eval('import("file-type")');
+  const fileType = await fileTypeFromFile(fullFilePath);
   if (!fileType) {
     return false;
   }

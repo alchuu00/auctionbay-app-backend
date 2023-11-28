@@ -31,10 +31,12 @@
     "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",
     "esm-hook": "^0.1.4",
-    "file-type": "^14.0.0",
+    "file-type": "^18.7.0",
+    "handlebars": "^4.7.8",
     "husky": "^8.0.2",
     "json2csv": "^5.0.7",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -43,7 +45,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "swagger-ui-express": "^4.6.0",
-    "typeorm": "^0.3.10"
+    "typeorm": "^0.3.10",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

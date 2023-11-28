@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
 import { RegisterUserDto } from './dto/register-user.dto';
 import { hash } from 'bcrypt';
 import { User } from 'src/entities/user.entity';
@@ -8,10 +7,14 @@ import Logging from 'src/library/Logging';
 import { compareHash } from 'src/utils/bcrypt';
 import { UsersService } from '../users/users.service';
 import { RequestWithUser } from 'src/interfaces/auth.interface';
+import sendResetEmail from 'src/utils/sendResetEmail';
+import { TokenService } from '../token/token.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private tokenService: TokenService,
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
@@ -33,7 +36,6 @@ export class AuthService {
   async register(registerUserDto: RegisterUserDto): Promise<User> {
     const hashedPassword: string = await hash(registerUserDto.password, 10);
     const user = await this.usersService.create({
-      role_id: null,
       ...registerUserDto,
       password: hashedPassword,
     });
@@ -52,5 +54,30 @@ export class AuthService {
   async getUserId(request: RequestWithUser): Promise<string> {
     const user = request.user as User;
     return user.id;
+  }
+
+  async sendPasswordResetEmail(email: string) {
+    const user = await this.usersService.findBy({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const tokenValue = uuidv4();
+    const token = await this.tokenService.create({
+      token: tokenValue,
+      email: user.email,
+      userId: user.id,
+    });
+    sendResetEmail(
+      email,
+      'Password Reset Request',
+      {
+        name: user.first_name,
+        id: user.id,
+        token: token.token,
+        link: `http://localhost:3000/reset-password/${token.token}`,
+      },
+      'resetPassword.handlebars',
+    );
+    return true;
   }
 }

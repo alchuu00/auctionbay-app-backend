@@ -70,13 +70,4 @@ export class AuctionItemsService extends AbstractService {
 
     return this.update(auctionItem.id, { ...auctionItem, image });
   }
-
-  async calculateAuctionDuration(auctionItem: AuctionItem): Promise<number> {
-    const endDate = new Date(auctionItem.end_date);
-    const currentDate = new Date();
-    // calculate duration in hours considering days and hours
-    const duration = Math.abs(endDate.getTime() - currentDate.getTime()) / 36e5;
-
-    return duration;
-  }
 }

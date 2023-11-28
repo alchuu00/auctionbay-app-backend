@@ -113,6 +113,7 @@ export class AuctionItemsController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<AuctionItem> {
+    console.log('auction item id', id);
     return this.auctionItemsService.remove(id);
   }
 }

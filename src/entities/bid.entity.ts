@@ -8,6 +8,9 @@ export class Bid extends Base {
   @Column({ type: 'int' })
   bid_amount: number;
 
+  @Column({ nullable: true })
+  status: string;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   bidder: User;

@@ -6,6 +6,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   UseInterceptors,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { Bid } from 'src/entities/bid.entity';
@@ -35,7 +36,9 @@ export class BidsController {
 
   // handle GET request to retrieve all bids for a specific bidder
   @Get('bidder/:bidderId')
-  async getBidsByBidderId(@Param('bidderId') bidderId: string): Promise<Bid[]> {
+  async getBidsByBidderId(
+    @Param('bidderId', new ParseUUIDPipe({ version: '4' })) bidderId: string,
+  ): Promise<Bid[]> {
     return await this.bidsService.getBidsByBidderId(bidderId);
   }
 

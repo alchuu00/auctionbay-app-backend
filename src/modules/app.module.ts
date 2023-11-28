@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { AuctionItemsModule } from './auctionItems/auctionItems.module';
 import { AuthModule } from './auth/auth.module';
 import { BidsModule } from './bids/bids.module';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { BidsModule } from './bids/bids.module';
     UsersModule,
     AuctionItemsModule,
     BidsModule,
+    TokenModule,
   ],
   controllers: [],
 })

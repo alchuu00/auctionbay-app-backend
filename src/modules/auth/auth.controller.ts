@@ -33,8 +33,15 @@ export class AuthController {
   @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() body: RegisterUserDto): Promise<User> {
-    return this.authService.register(body);
+  async register(
+    @Body() body: RegisterUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResponse> {
+    const newUser = await this.authService.register(body);
+    const access_token = await this.authService.generateJwt(newUser);
+    res.cookie('access_token', access_token, { httpOnly: true });
+    res.cookie('user_id', newUser.id);
+    return { user: newUser, access_token };
   }
 
   @Public()
@@ -63,5 +70,13 @@ export class AuthController {
   signout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token');
     res.clearCookie('user_id');
+  }
+
+  @Public()
+  @Post('send-password-reset-email')
+  @HttpCode(HttpStatus.OK)
+  async sendPasswordResetEmail(@Req() req: RequestWithUser): Promise<void> {
+    const { email } = req.body;
+    await this.authService.sendPasswordResetEmail(email);
   }
 }

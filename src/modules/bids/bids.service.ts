@@ -38,6 +38,29 @@ export class BidsService extends AbstractService {
     bid.auction_item = auctionItem;
     bid.bidder = bidder;
     bid.bid_amount = bidAmount;
+    bid.status = '';
+
+    // Fetch all other bids for the same auction item
+    const otherBids = await this.bidsRepository.find({
+      where: {
+        auction_item: { id: auctionItemId },
+      },
+    });
+
+    // Determine if the new bid is winning
+    const isWinning = otherBids.every((b) => bidAmount > b.bid_amount);
+
+    if (isWinning) {
+      bid.status = 'Winning';
+
+      // Update all other bids to "Outbid"
+      otherBids.forEach((b) => {
+        b.status = 'Outbid';
+        this.bidsRepository.save(b);
+      });
+    } else {
+      bid.status = 'Outbid';
+    }
 
     return await this.bidsRepository.save(bid);
   }

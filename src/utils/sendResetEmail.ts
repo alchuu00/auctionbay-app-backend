@@ -6,13 +6,13 @@ import handlebars from 'handlebars';
 const sendResetEmail = async (email, subject, payload, template) => {
   try {
     const transporter = nodemailer.createTransport({
-      service: 'hotmail',
-      host: 'smtp-mail.outlook.com',
+      service: `${process.env.SMTP_SERVICE}`,
+      host: `${process.env.SMTP_HOST}`,
       secure: false,
-      port: 587,
+      port: `${process.env.SMTP_PORT}`,
       auth: {
-        user: 'alchuu00@outlook.com',
-        pass: 'Outlook123',
+        user: `${process.env.SMTP_USER}`,
+        pass: `${process.env.SMTP_PASS}`,
       },
       tls: {
         rejectUnauthorized: false,

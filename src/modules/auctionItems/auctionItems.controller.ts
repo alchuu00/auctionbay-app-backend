@@ -13,6 +13,7 @@ import {
   BadRequestException,
   Patch,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -21,6 +22,7 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { join } from 'path';
+import { parse } from 'cookie';
 import {
   saveImageToStorage,
   isFileExtensionSafe,
@@ -30,6 +32,7 @@ import { PaginatedResult } from 'src/interfaces/paginated-results.interface';
 import { AuctionItemsService } from './auctionItems.service';
 import { AuctionItem } from 'src/entities/auction_item.entity';
 import { CreateUpdateAuctionItemDto } from './dto/createUpdateAuctionItem.dto';
+import { Request } from 'express';
 
 @ApiTags('auctionItems')
 @Controller('auctionItems')
@@ -41,7 +44,6 @@ export class AuctionItemsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('page') page: number): Promise<PaginatedResult> {
-    console.log('paginate auction items');
     return this.auctionItemsService.paginate(page);
   }
 
@@ -59,13 +61,17 @@ export class AuctionItemsController {
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createUpdateAuctionItemDto: CreateUpdateAuctionItemDto,
+    @Req() req: Request,
   ): Promise<AuctionItem> {
-    return this.auctionItemsService.create(createUpdateAuctionItemDto);
+    const cookies = parse(req.headers.cookie || ''); // Parse the cookies from the request headers
+    const user_id = cookies['user_id']; // Access the user_id from the parsed cookies
+    const userId = user_id;
+    return this.auctionItemsService.create(createUpdateAuctionItemDto, userId);
   }
 
   // handle POST request to upload auction item image
   @Post('upload/:id')
-  @UseInterceptors(FileInterceptor('image', { storage: saveImageToStorage }))
+  @UseInterceptors(FileInterceptor('image', saveImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File, // Extract the uploaded file from the request
@@ -107,6 +113,7 @@ export class AuctionItemsController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<AuctionItem> {
+    console.log('auction item id', id);
     return this.auctionItemsService.remove(id);
   }
 }

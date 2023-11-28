@@ -12,8 +12,8 @@ export class AuctionItem extends Base {
   @Column({ nullable: true })
   description: string;
 
-  @Column()
-  image: string;
+  @Column({ nullable: true })
+  image?: string;
 
   @Column({ nullable: true })
   start_price: number;
@@ -21,7 +21,9 @@ export class AuctionItem extends Base {
   @Column({ nullable: true })
   end_date: string;
 
-  @OneToMany(() => Bid, (bid) => bid.auction_item, { eager: true })
+  @OneToMany(() => Bid, (bid) => bid.auction_item, {
+    eager: true,
+  })
   bids: Bid[];
 
   @ManyToOne(() => User)

@@ -1,4 +1,10 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
@@ -25,7 +31,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       const access_token = request.cookies['access_token'];
       return !!this.jwtService.verify(access_token);
     } catch (error) {
-      return false;
+      throw new UnauthorizedException('Not authenticated');
     }
   }
 }

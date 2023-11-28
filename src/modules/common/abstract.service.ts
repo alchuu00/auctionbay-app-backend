@@ -6,6 +6,8 @@ import {
 import { PaginatedResult } from 'src/interfaces/paginated-results.interface';
 import Logging from 'src/library/Logging';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
+import path from 'path';
 
 @Injectable()
 export abstract class AbstractService {
@@ -56,24 +58,34 @@ export abstract class AbstractService {
 
   async remove(id: string): Promise<any> {
     const element = await this.findById(id);
+    console.log('element', element);
     try {
+      const imagePath = path.resolve(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'files',
+        element.image,
+      );
+      fs.unlinkSync(imagePath);
       return this.repository.remove(element);
     } catch (error) {
       Logging.error(error);
       throw new InternalServerErrorException(
-        'Something went wrong while deleting a element.',
+        'Something went wrong while deleting an element.',
       );
     }
   }
 
   async paginate(page = 1, relations = []): Promise<PaginatedResult> {
-    const take = 10;
+    const take = 1000;
 
     try {
       const [data, total] = await this.repository.findAndCount({
-        take,
-        skip: (page - 1) * take,
-        relations,
+        relations: ['user'],
+        skip: (page - 1) * 10,
+        take: take,
       });
 
       return {

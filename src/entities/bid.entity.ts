@@ -5,15 +5,17 @@ import { Base } from './base.entity';
 
 @Entity()
 export class Bid extends Base {
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'int' })
   bid_amount: number;
+
+  @Column({ nullable: true })
+  status: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   bidder: User;
 
-  @ManyToOne(() => AuctionItem)
+  @ManyToOne(() => AuctionItem, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'auction_item_id' })
   auction_item: AuctionItem;
-  bid: { id: string };
 }

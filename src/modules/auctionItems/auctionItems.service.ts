@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,16 +16,22 @@ export class AuctionItemsService extends AbstractService {
   constructor(
     @InjectRepository(AuctionItem)
     private readonly auctionItemsRepository: Repository<AuctionItem>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {
     super(auctionItemsRepository);
   }
 
   async create(
     createAuctionItemDto: CreateUpdateAuctionItemDto,
+    userId: string,
   ): Promise<AuctionItem> {
     try {
-      const auctionItem =
-        this.auctionItemsRepository.create(createAuctionItemDto);
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      const auctionItem = this.auctionItemsRepository.create({
+        ...createAuctionItemDto,
+        user: user,
+      });
       return this.auctionItemsRepository.save(auctionItem);
     } catch (error) {
       Logging.error(error);
@@ -64,14 +69,5 @@ export class AuctionItemsService extends AbstractService {
     const auctionItem = await this.findById(id);
 
     return this.update(auctionItem.id, { ...auctionItem, image });
-  }
-
-  async calculateAuctionDuration(auctionItem: AuctionItem): Promise<number> {
-    const endDate = new Date(auctionItem.end_date);
-    const currentDate = new Date();
-    // calculate duration in hours considering days and hours
-    const duration = Math.abs(endDate.getTime() - currentDate.getTime()) / 36e5;
-
-    return duration;
   }
 }

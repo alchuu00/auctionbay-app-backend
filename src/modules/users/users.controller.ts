@@ -31,6 +31,7 @@ import {
   isFileExtensionSafe,
   removeFile,
 } from 'src/helpers/imageStorage';
+import { Public } from 'src/decorators/public.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -49,8 +50,9 @@ export class UsersController {
 
   // handle GET request to retrieve a user with a specific id
   @Get(':id')
+  @Public()
   @HttpCode(HttpStatus.OK)
-  async findOne(@Param('id') id: string): Promise<User> {
+  async findById(@Param('id') id: string): Promise<User> {
     return this.usersService.findById(id);
   }
 

@@ -6,12 +6,11 @@ import {
   Body,
   ClassSerializerInterceptor,
   UseInterceptors,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { Bid } from 'src/entities/bid.entity';
-import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('users')
 @Controller('bids')
 @UseInterceptors(ClassSerializerInterceptor)
 export class BidsController {
@@ -37,15 +36,17 @@ export class BidsController {
 
   // handle GET request to retrieve all bids for a specific bidder
   @Get('bidder/:bidderId')
-  async getBidsByBidderId(@Param('bidderId') bidderId: string): Promise<Bid[]> {
+  async getBidsByBidderId(
+    @Param('bidderId', new ParseUUIDPipe({ version: '4' })) bidderId: string,
+  ): Promise<Bid[]> {
     return await this.bidsService.getBidsByBidderId(bidderId);
   }
 
   // handle GET request to retrieve the winning bid for a specific auction item
   @Get(':auctionItemId/winning-bid')
-  async getWinningBid(
+  async getHighestBidder(
     @Param('auctionItemId') auctionItemId: string,
   ): Promise<Bid> {
-    return await this.bidsService.getWinningBid(auctionItemId);
+    return await this.bidsService.getHighestBidder(auctionItemId);
   }
 }

@@ -10,9 +10,11 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtStrategy } from './strategies/jwt.strategies';
 import { LocalStrategy } from './strategies/local.strategies';
 import { UsersModule } from '../users/users.module';
+import { TokenModule } from '../token/token.module';
 
 @Module({
   imports: [
+    TokenModule,
     UsersModule,
     PassportModule,
     JwtModule.registerAsync({

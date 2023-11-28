@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 
 import { Base } from './base.entity';
 import { Bid } from './bid.entity';
+import { AuctionItem } from './auction_item.entity';
 
 @Entity()
 export class User extends Base {
@@ -21,6 +22,9 @@ export class User extends Base {
   @Column({ nullable: true })
   @Exclude()
   password: string;
+
+  @OneToMany(() => AuctionItem, (auction_item) => auction_item.user)
+  auction_items: AuctionItem[];
 
   @OneToMany(() => Bid, (bid) => bid.bidder)
   bids: Bid[];

@@ -22,6 +22,29 @@ export class AuctionItemsService extends AbstractService {
     super(auctionItemsRepository);
   }
 
+  async findWinning(userId: string): Promise<AuctionItem[]> {
+    console.log('userId: ', userId);
+    const status = 'Winning';
+    try {
+      const winnings = await this.auctionItemsRepository
+        .createQueryBuilder()
+        .select('auction_item')
+        .from(AuctionItem, 'auction_item')
+        .leftJoinAndSelect('auction_item.bids', 'bids')
+        .where('bids.user_id = :userId', { userId })
+        .andWhere('bids.status = :status', { status: status })
+        .andWhere('auction_item.end_date < :now', { now: new Date() })
+        .getMany();
+
+      return winnings;
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while searching for a paginated elements.',
+      );
+    }
+  }
+
   async create(
     createAuctionItemDto: CreateUpdateAuctionItemDto,
     userId: string,

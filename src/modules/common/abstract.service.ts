@@ -7,7 +7,7 @@ import { PaginatedResult } from 'src/interfaces/paginated-results.interface';
 import Logging from 'src/library/Logging';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-import path from 'path';
+import path, { join } from 'path';
 
 @Injectable()
 export abstract class AbstractService {
@@ -60,14 +60,7 @@ export abstract class AbstractService {
     const element = await this.findById(id);
     console.log('element', element);
     try {
-      const imagePath = path.resolve(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        'files',
-        element.image,
-      );
+      const imagePath = join(process.cwd(), 'files', element.image);
       fs.unlinkSync(imagePath);
       return this.repository.remove(element);
     } catch (error) {

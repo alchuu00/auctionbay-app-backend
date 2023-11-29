@@ -33,6 +33,7 @@ import { AuctionItemsService } from './auctionItems.service';
 import { AuctionItem } from 'src/entities/auction_item.entity';
 import { CreateUpdateAuctionItemDto } from './dto/createUpdateAuctionItem.dto';
 import { Request } from 'express';
+import { RequestWithUser } from 'src/interfaces/auth.interface';
 
 @ApiTags('auctionItems')
 @Controller('auctionItems')
@@ -45,6 +46,12 @@ export class AuctionItemsController {
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('page') page: number): Promise<PaginatedResult> {
     return this.auctionItemsService.paginate(page);
+  }
+
+  @Get('/won/:userId')
+  @HttpCode(HttpStatus.OK)
+  async findWon(@Param('userId') userId: string): Promise<AuctionItem[]> {
+    return this.auctionItemsService.findWinning(userId);
   }
 
   // handle GET request to retrieve an auction item with a specific id
@@ -113,7 +120,6 @@ export class AuctionItemsController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<AuctionItem> {
-    console.log('auction item id', id);
     return this.auctionItemsService.remove(id);
   }
 }

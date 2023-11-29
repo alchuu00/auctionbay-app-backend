@@ -84,8 +84,13 @@ export class UsersController {
     const fullImagePath = join(imagesFolderPath + '/' + file.filename); // Define the full path to the uploaded image file
 
     if (await isFileExtensionSafe(fullImagePath)) {
-      // Check if the uploaded file has a safe file extension
-      return this.usersService.updateUserImageId(id, filename); // Call the updateUserImageId method of the usersService instance to update the user's avatar image ID in the database
+      const oldImageId = await this.usersService.getUserImageId(id);
+      const result = await this.usersService.updateUserImageId(id, filename); // Call the updateUserImageId method of the usersService instance to update the user's avatar image ID in the database
+      if (oldImageId) {
+        const oldImagePath = join(imagesFolderPath + '/' + oldImageId); // Define the full path to the old avatar image file
+        removeFile(oldImagePath); // Remove the old avatar image from the file system
+      }
+      return result;
     }
 
     removeFile(fullImagePath); // Remove the uploaded file from the file system if it does not have a safe file extension

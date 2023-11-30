@@ -41,12 +41,4 @@ export class BidsController {
   ): Promise<Bid[]> {
     return await this.bidsService.getBidsByBidderId(bidderId);
   }
-
-  // handle GET request to retrieve the winning bid for a specific auction item
-  @Get(':auctionItemId/winning-bid')
-  async getHighestBidder(
-    @Param('auctionItemId') auctionItemId: string,
-  ): Promise<Bid> {
-    return await this.bidsService.getHighestBidder(auctionItemId);
-  }
 }

@@ -40,9 +40,6 @@ export class TokenController {
     @Param('id') id: string,
     @Body() { updateUserDto, token },
   ) {
-    console.log('id:', id);
-    console.log('updateUserDto:', updateUserDto);
-    console.log('token:', token);
     await this.tokenService.resetPassword(id, token, updateUserDto);
   }
 }

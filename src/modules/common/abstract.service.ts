@@ -58,7 +58,6 @@ export abstract class AbstractService {
 
   async remove(id: string): Promise<any> {
     const element = await this.findById(id);
-    console.log('element', element);
     try {
       const imagePath = join(process.cwd(), 'files', element.image);
       fs.unlinkSync(imagePath);

@@ -42,15 +42,10 @@ export class TokenService {
   }
 
   async resetPassword(userId, token, updateUserDto) {
-    console.log('userId:', userId);
-    console.log('token:', token);
-    console.log('updateUserDto:', updateUserDto);
 
     const passwordResetToken = await this.tokenRepository.findOne({
       where: { token: token },
     });
-
-    console.log('passwordResetToken:', passwordResetToken.token);
 
     if (!passwordResetToken.token) {
       throw new Error('Invalid or expired password reset token');
@@ -62,15 +57,11 @@ export class TokenService {
       isValid = true;
     }
 
-    console.log('isValid:', isValid);
-
     if (!isValid) {
       throw new Error('Invalid or expired password reset token');
     }
 
     const user = await this.usersService.findById(userId);
-
-    console.log('user:', user);
 
     await this.usersService.update(userId, updateUserDto);
 

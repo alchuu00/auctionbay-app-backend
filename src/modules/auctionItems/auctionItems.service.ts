@@ -22,8 +22,18 @@ export class AuctionItemsService extends AbstractService {
     super(auctionItemsRepository);
   }
 
-  async findWinning(userId: string): Promise<AuctionItem[]> {
-    console.log('userId: ', userId);
+  async findAuctionByAuctionId(id: string): Promise<AuctionItem> {
+    try {
+      return this.auctionItemsRepository.findOneOrFail({ where: { id } });
+    } catch (error) {
+      Logging.error(error);
+      throw new BadRequestException(
+        'Something went wrong while searching for the auction item.',
+      );
+    }
+  }
+
+  async findWon(userId: string): Promise<AuctionItem[]> {
     const status = 'Winning';
     try {
       const winnings = await this.auctionItemsRepository
@@ -34,6 +44,28 @@ export class AuctionItemsService extends AbstractService {
         .where('bids.user_id = :userId', { userId })
         .andWhere('bids.status = :status', { status: status })
         .andWhere('auction_item.end_date < :now', { now: new Date() })
+        .getMany();
+
+      return winnings;
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while searching for a paginated elements.',
+      );
+    }
+  }
+
+  async findWinning(userId: string): Promise<AuctionItem[]> {
+    const status = 'Winning';
+    try {
+      const winnings = await this.auctionItemsRepository
+        .createQueryBuilder()
+        .select('auction_item')
+        .from(AuctionItem, 'auction_item')
+        .leftJoinAndSelect('auction_item.bids', 'bids')
+        .where('bids.user_id = :userId', { userId })
+        .andWhere('bids.status = :status', { status: status })
+        .andWhere('auction_item.end_date > :now', { now: new Date() })
         .getMany();
 
       return winnings;
@@ -92,5 +124,43 @@ export class AuctionItemsService extends AbstractService {
     const auctionItem = await this.findById(id);
 
     return this.update(auctionItem.id, { ...auctionItem, image });
+  }
+
+  async fetchByUser(userId: string): Promise<AuctionItem[]> {
+    try {
+      const auctions = await this.auctionItemsRepository
+        .createQueryBuilder()
+        .select('auction_item')
+        .from(AuctionItem, 'auction_item')
+        .leftJoinAndSelect('auction_item.bids', 'bids')
+        .where('auction_item.user_id = :userId', { userId })
+        .getMany();
+
+      return auctions;
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while searching for elements.',
+      );
+    }
+  }
+
+  async findBidded(userId: string): Promise<AuctionItem[]> {
+    try {
+      const bidded = await this.auctionItemsRepository
+        .createQueryBuilder()
+        .select('auction_item')
+        .from(AuctionItem, 'auction_item')
+        .leftJoinAndSelect('auction_item.bids', 'bids')
+        .where('bids.user_id = :userId', { userId })
+        .getMany();
+
+      return bidded;
+    } catch (error) {
+      Logging.error(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while searching for elements.',
+      );
+    }
   }
 }

@@ -33,7 +33,6 @@ import { AuctionItemsService } from './auctionItems.service';
 import { AuctionItem } from 'src/entities/auction_item.entity';
 import { CreateUpdateAuctionItemDto } from './dto/createUpdateAuctionItem.dto';
 import { Request } from 'express';
-import { RequestWithUser } from 'src/interfaces/auth.interface';
 
 @ApiTags('auctionItems')
 @Controller('auctionItems')
@@ -48,17 +47,39 @@ export class AuctionItemsController {
     return this.auctionItemsService.paginate(page);
   }
 
+  // handle GET request to retrieve auction items by a specific user
+  @Get(':userId')
+  @HttpCode(HttpStatus.OK)
+  async findByUser(@Param('userId') userId: string): Promise<AuctionItem[]> {
+    return this.auctionItemsService.fetchByUser(userId);
+  }
+
+  // handle GET request to retrieve auctions bidded on by a specific user
+  @Get('bidded/:userId')
+  @HttpCode(HttpStatus.OK)
+  async findBidded(@Param('userId') userId: string): Promise<AuctionItem[]> {
+    return this.auctionItemsService.findBidded(userId);
+  }
+
+  // handle GET request to retrieve auctions won by a specific user
   @Get('/won/:userId')
   @HttpCode(HttpStatus.OK)
   async findWon(@Param('userId') userId: string): Promise<AuctionItem[]> {
+    return this.auctionItemsService.findWon(userId);
+  }
+
+  // handle GET request to retrieve auctions currently winning by a specific user
+  @Get('/winning/:userId')
+  @HttpCode(HttpStatus.OK)
+  async findWinning(@Param('userId') userId: string): Promise<AuctionItem[]> {
     return this.auctionItemsService.findWinning(userId);
   }
 
   // handle GET request to retrieve an auction item with a specific id
-  @Get(':id')
+  @Get('auction/:id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id') id: string): Promise<AuctionItem> {
-    return this.auctionItemsService.findById(id);
+    return this.auctionItemsService.findAuctionByAuctionId(id);
   }
 
   // handle POST request to create a new auction item

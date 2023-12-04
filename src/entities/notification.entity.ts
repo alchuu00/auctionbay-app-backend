@@ -6,12 +6,12 @@ export class Notification extends Base {
   @Column()
   message: string;
 
-  @Column()
-  auctionItemImage: string;
+  @Column({ nullable: true })
+  auctionItemImage?: string;
 
   @Column()
   auctionItemTitle: string;
 
-  @Column()
-  bidAmount: number;
+  @Column({ nullable: true })
+  bidAmount?: number;
 }

@@ -10,7 +10,6 @@ import {
   Post,
   Body,
   UploadedFile,
-  BadRequestException,
   Patch,
   Delete,
   Req,
@@ -21,13 +20,8 @@ import {
   ApiCreatedResponse,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { join } from 'path';
 import { parse } from 'cookie';
-import {
-  saveImageToStorage,
-  isFileExtensionSafe,
-  removeFile,
-} from 'src/helpers/imageStorage';
+import { saveImageToStorage } from 'src/helpers/imageStorage';
 import { PaginatedResult } from 'src/interfaces/paginated-results.interface';
 import { AuctionItemsService } from './auctionItems.service';
 import { AuctionItem } from 'src/entities/auction_item.entity';

@@ -16,4 +16,9 @@ export class NotificationsController {
     this.notificationsService.addClient(res);
     res.write('\n');
   }
+
+  @Get('all')
+  async getAll() {
+    return this.notificationsService.findAll();
+  }
 }

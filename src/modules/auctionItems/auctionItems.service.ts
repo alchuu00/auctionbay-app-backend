@@ -13,6 +13,7 @@ import { User } from 'src/entities/user.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { join } from 'path';
 import { isFileExtensionSafe, removeFile } from 'src/helpers/imageStorage';
+import * as cron from 'node-cron';
 
 @Injectable()
 export class AuctionItemsService extends AbstractService {
@@ -23,6 +24,12 @@ export class AuctionItemsService extends AbstractService {
     private userRepository: Repository<User>,
     private notificationsService: NotificationsService,
   ) {
+    cron.schedule('0 * * * *', async () => {
+      const auctionItems = await this.findAll();
+      auctionItems.forEach(async (item) => {
+        await this.checkAuctionStatus(item);
+      });
+    });
     super(auctionItemsRepository);
   }
 
@@ -185,6 +192,25 @@ export class AuctionItemsService extends AbstractService {
       throw new InternalServerErrorException(
         'Something went wrong while searching for elements.',
       );
+    }
+  }
+
+  async checkAuctionStatus(auctionItem: AuctionItem) {
+    const timeLeft =
+      new Date(auctionItem.end_date).getTime() - new Date().getTime();
+    const hoursLeft = timeLeft / (1000 * 60 * 60);
+
+    if (hoursLeft > 0 && hoursLeft <= 24) {
+      const message = `Only 24 hours left for ${auctionItem.title}.`;
+      const notification = await this.notificationsService.createNotification({
+        message: message,
+        auctionItemImage: auctionItem.image,
+        auctionItemTitle: auctionItem.title,
+        bidAmount: auctionItem.bids[0]?.bid_amount
+          ? auctionItem.bids[0]?.bid_amount
+          : auctionItem.start_price,
+      });
+      this.notificationsService.sendUpdates(notification);
     }
   }
 }

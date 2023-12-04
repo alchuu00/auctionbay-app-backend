@@ -10,6 +10,9 @@ import Logging from 'src/library/Logging';
 import { CreateUpdateAuctionItemDto } from './dto/createUpdateAuctionItem.dto';
 import { AuctionItem } from 'src/entities/auction_item.entity';
 import { User } from 'src/entities/user.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { join } from 'path';
+import { isFileExtensionSafe, removeFile } from 'src/helpers/imageStorage';
 
 @Injectable()
 export class AuctionItemsService extends AbstractService {
@@ -18,6 +21,7 @@ export class AuctionItemsService extends AbstractService {
     private readonly auctionItemsRepository: Repository<AuctionItem>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private notificationsService: NotificationsService,
   ) {
     super(auctionItemsRepository);
   }
@@ -87,6 +91,7 @@ export class AuctionItemsService extends AbstractService {
         ...createAuctionItemDto,
         user: user,
       });
+
       return this.auctionItemsRepository.save(auctionItem);
     } catch (error) {
       Logging.error(error);
@@ -94,6 +99,24 @@ export class AuctionItemsService extends AbstractService {
         'Something went wrong while creating a new auction item.',
       );
     }
+  }
+
+  async handleFileUpload(file, auction_item_id) {
+    const filename = file?.filename;
+
+    if (!filename) {
+      throw new BadRequestException('File must be a png, jpg/jpeg');
+    }
+
+    const imagesFolderPath = join(process.cwd(), 'files');
+    const fullImagePath = join(imagesFolderPath + '/' + file.filename);
+
+    if (await isFileExtensionSafe(fullImagePath)) {
+      return this.updateAuctionItemImage(auction_item_id, filename);
+    }
+
+    removeFile(fullImagePath);
+    throw new BadRequestException('File content does not match extension!');
   }
 
   async update(
@@ -108,6 +131,7 @@ export class AuctionItemsService extends AbstractService {
       auctionItem.image = createUpdateAuctionItemDto.image;
       auctionItem.start_price = createUpdateAuctionItemDto.start_price;
       auctionItem.end_date = createUpdateAuctionItemDto.end_date;
+
       return this.auctionItemsRepository.save(auctionItem);
     } catch (error) {
       Logging.error(error);

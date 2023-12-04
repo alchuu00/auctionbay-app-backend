@@ -102,29 +102,13 @@ export class AuctionItemsController {
   @UseInterceptors(FileInterceptor('image', saveImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   async upload(
-    @UploadedFile() file: Express.Multer.File, // Extract the uploaded file from the request
-    @Param('id') auction_item_id: string, // Extract the auction ID from the request URL
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') auction_item_id: string,
   ): Promise<AuctionItem> {
-    const filename = file?.filename; // Extract the filename of the uploaded file from the file object
-
-    if (!filename) {
-      // Throw a BadRequestException if the uploaded file does not have a valid filename
-      throw new BadRequestException('File must be a png, jpg/jpeg');
-    }
-
-    const imagesFolderPath = join(process.cwd(), 'files'); // Define the path to the folder where uploaded images will be stored
-    const fullImagePath = join(imagesFolderPath + '/' + file.filename); // Define the full path to the uploaded image file
-
-    if (await isFileExtensionSafe(fullImagePath)) {
-      // Check if the uploaded file has a safe file extension
-      return this.auctionItemsService.updateAuctionItemImage(
-        auction_item_id,
-        filename,
-      ); // Call the updateAuctionItemImageId method of the auctionsService instance to update the AuctionItem's image ID in the database
-    }
-
-    removeFile(fullImagePath); // Remove the uploaded file from the file system if it does not have a safe file extension
-    throw new BadRequestException('File content does not match extension!'); // Throw a BadRequestException if the uploaded file does not have a safe file extension
+    return await this.auctionItemsService.handleFileUpload(
+      file,
+      auction_item_id,
+    );
   }
 
   // handle PATCH request to update auction item information

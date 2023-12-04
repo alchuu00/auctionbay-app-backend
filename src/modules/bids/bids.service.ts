@@ -5,12 +5,16 @@ import { Repository } from 'typeorm';
 import { AbstractService } from '../common/abstract.service';
 import { UsersService } from '../users/users.service';
 import { AuctionItemsService } from '../auctionItems/auctionItems.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { User } from 'src/entities/user.entity';
+import { AuctionItem } from 'src/entities/auction_item.entity';
 
 @Injectable()
 export class BidsService extends AbstractService {
   constructor(
     @InjectRepository(Bid) private readonly bidsRepository: Repository<Bid>,
     private readonly auctionItemsService: AuctionItemsService,
+    private readonly notificationsService: NotificationsService,
     private readonly usersService: UsersService,
   ) {
     super(bidsRepository);
@@ -21,13 +25,15 @@ export class BidsService extends AbstractService {
     bidderId: string,
     bidAmount: number,
   ): Promise<Bid> {
-    const auctionItem = await this.auctionItemsService.findById(auctionItemId);
+    const auctionItem: AuctionItem = await this.auctionItemsService.findById(
+      auctionItemId,
+    );
 
     if (!auctionItem) {
       throw new NotFoundException('Auction item not found');
     }
 
-    const bidder = await this.usersService.findById(bidderId);
+    const bidder: User = await this.usersService.findById(bidderId);
 
     if (!bidder) {
       throw new NotFoundException('Bidder not found');
@@ -61,6 +67,18 @@ export class BidsService extends AbstractService {
     } else {
       bid.status = 'Outbid';
     }
+
+    // Create a notification
+    const userName = (bidder.first_name + ' ' + bidder.last_name).trim();
+    const userNotification = await this.notificationsService.createNotification(
+      {
+        message: `${userName} placed a bid.`,
+        auctionItemImage: auctionItem.image,
+        auctionItemTitle: auctionItem.title,
+        bidAmount: bidAmount,
+      },
+    );
+    this.notificationsService.sendUpdates(userNotification);
 
     return await this.bidsRepository.save(bid);
   }

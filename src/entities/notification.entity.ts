@@ -13,8 +13,5 @@ export class Notification extends Base {
   auctionItemTitle: string;
 
   @Column()
-  bidStatus: string;
-
-  @Column()
   bidAmount: number;
 }

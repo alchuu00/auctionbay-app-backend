@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '../../entities/notification.entity';
+import path from 'path';
 
 @Injectable()
 export class NotificationsService {
@@ -16,25 +17,19 @@ export class NotificationsService {
     this.clients.push(client);
   }
 
-  async createNotification(
-    message: string,
-    auctionItemImage: string,
-    auctionItemTitle: string,
-    bidStatus: string,
-    bidAmount: number,
-  ): Promise<Notification> {
-    const notification = new Notification();
-    notification.message = message;
-    notification.auctionItemImage = auctionItemImage;
-    notification.auctionItemTitle = auctionItemTitle;
-    notification.bidStatus = bidStatus;
-    notification.bidAmount = bidAmount;
-    return this.notificationsRepository.save(notification);
+  async createNotification(notification): Promise<Notification> {
+    const savedNotification = await this.notificationsRepository.save(
+      notification,
+    );
+
+    return savedNotification;
   }
 
   async sendUpdates(data) {
     this.clients.forEach((client) =>
-      client.write(`data: ${JSON.stringify(data)}\n\n`),
+      client.write(`data: ${JSON.stringify(data)}/n/n`),
     );
+
+    console.log('notification data', data);
   }
 }

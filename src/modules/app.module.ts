@@ -13,6 +13,7 @@ import { AuctionItemsModule } from './auctionItems/auctionItems.module';
 import { AuthModule } from './auth/auth.module';
 import { BidsModule } from './bids/bids.module';
 import { TokenModule } from './token/token.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TokenModule } from './token/token.module';
     AuctionItemsModule,
     BidsModule,
     TokenModule,
+    NotificationsModule,
   ],
   controllers: [],
 })

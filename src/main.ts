@@ -22,8 +22,8 @@ async function bootstrap() {
 
   // Setup Swagger
   const config = new DocumentBuilder()
-    .setTitle('NestJS tutorial API')
-    .setDescription('This is API for NestJS tutorial.')
+    .setTitle('AuctionBay API')
+    .setDescription('This is API for AuctionBay App')
     .setVersion('1.0.0')
     .build();
 

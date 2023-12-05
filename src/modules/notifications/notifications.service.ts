@@ -29,7 +29,7 @@ export class NotificationsService extends AbstractService {
 
   async sendUpdates(data) {
     this.clients.forEach((client) =>
-      client.write(`data: ${JSON.stringify(data)}/n/n`),
+      client.write(`data: ${JSON.stringify(data)}\n\n`),
     );
   }
 }

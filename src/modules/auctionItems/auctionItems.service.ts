@@ -201,7 +201,9 @@ export class AuctionItemsService extends AbstractService {
     const hoursLeft = timeLeft / (1000 * 60 * 60);
 
     if (hoursLeft > 0 && hoursLeft <= 24) {
-      const message = `Only 24 hours left for ${auctionItem.title}.`;
+      const message = `Only ${Math.round(hoursLeft)} hours left for ${
+        auctionItem.title
+      }.`;
       const notification = await this.notificationsService.createNotification({
         message: message,
         auctionItemImage: auctionItem.image,

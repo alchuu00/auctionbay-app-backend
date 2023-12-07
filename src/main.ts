@@ -11,25 +11,29 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+  // Enable CORS for the frontend to access the API
   app.enableCors({
     origin: ['http://localhost:3000'],
     credentials: true,
   });
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
-  // Setup to display files
+  // Setup to serve static files
   app.use('/files', express.static('files'));
 
   // Setup Swagger
   const config = new DocumentBuilder()
-    .setTitle('AuctionBay API')
-    .setDescription('This is API for AuctionBay App')
+    .setTitle('AuctionBay API - Online Auction Platform')
+    .setDescription(
+      'This is the API for the AuctionBay application. The application provides a platform for online auctions, allowing users to bid on various items.',
+    )
     .setVersion('1.0.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
 
+  // Start the backend server
   const PORT = process.env.PORT || 8080;
   await app.listen(PORT);
 

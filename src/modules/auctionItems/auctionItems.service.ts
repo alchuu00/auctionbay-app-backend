@@ -24,6 +24,7 @@ export class AuctionItemsService extends AbstractService {
     private userRepository: Repository<User>,
     private notificationsService: NotificationsService,
   ) {
+    // Check auction status every hour
     cron.schedule('0 * * * *', async () => {
       const auctionItems = await this.findAll();
       auctionItems.forEach(async (item) => {
@@ -115,13 +116,16 @@ export class AuctionItemsService extends AbstractService {
       throw new BadRequestException('File must be a png, jpg/jpeg');
     }
 
+    // create a path to the file inside the container
     const imagesFolderPath = join(process.cwd(), 'files');
     const fullImagePath = join(imagesFolderPath + '/' + file.filename);
 
+    // check if the file extension is safe
     if (await isFileExtensionSafe(fullImagePath)) {
       return this.updateAuctionItemImage(auction_item_id, filename);
     }
 
+    // remove the file if the extension is not safe
     removeFile(fullImagePath);
     throw new BadRequestException('File content does not match extension!');
   }
@@ -196,10 +200,12 @@ export class AuctionItemsService extends AbstractService {
   }
 
   async checkAuctionStatus(auctionItem: AuctionItem) {
+    // calculate time left
     const timeLeft =
       new Date(auctionItem.end_date).getTime() - new Date().getTime();
     const hoursLeft = timeLeft / (1000 * 60 * 60);
 
+    // generate notification if auction is ending in 24 hours or less
     if (hoursLeft > 0 && hoursLeft <= 24) {
       const message = `Only ${Math.round(hoursLeft)} hours left for ${
         auctionItem.title

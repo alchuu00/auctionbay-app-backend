@@ -42,7 +42,6 @@ export class TokenService {
   }
 
   async resetPassword(userId, token, updateUserDto) {
-
     const passwordResetToken = await this.tokenRepository.findOne({
       where: { token: token },
     });

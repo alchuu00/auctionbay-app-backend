@@ -19,12 +19,27 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { User } from 'src/entities/user.entity';
 import { RequestWithUser } from 'src/interfaces/auth.interface';
+import {
+  ApiBadGatewayResponse,
+  ApiBody,
+  ApiCookieAuth,
+  ApiHeader,
+  ApiHeaders,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { LoginUserDto } from './dto/login-user.dto';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { string } from '@hapi/joi';
 
 interface LoginResponse {
   user: User;
   access_token: string;
 }
 
+@ApiTags('Authentication')
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
@@ -33,6 +48,12 @@ export class AuthController {
   @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiBody({ type: RegisterUserDto })
+  @ApiOkResponse({
+    type: RegisterUserDto,
+    description: 'User registered successfully',
+  })
   async register(
     @Body() body: RegisterUserDto,
     @Res({ passthrough: true }) res: Response,
@@ -48,6 +69,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login a user' })
+  @ApiBody({ type: LoginUserDto })
+  @ApiOkResponse({
+    type: LoginUserDto,
+    description: 'User logged in successfully',
+  })
   async login(
     @Req() req: RequestWithUser,
     @Res({ passthrough: true }) res: Response,
@@ -60,6 +87,10 @@ export class AuthController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiCookieAuth('access_token')
+  @ApiOperation({ summary: 'Get user information' })
+  @ApiBody({ type: User })
+  @ApiOkResponse({ type: User, description: 'User information' })
   async user(@Req() req: Request): Promise<User> {
     const cookie = req.cookies['access_token'];
     return this.authService.user(cookie);
@@ -67,6 +98,8 @@ export class AuthController {
 
   @Post('signout')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Sign out a user' })
+  @ApiOkResponse({ description: 'User signed out successfully' })
   signout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token');
     res.clearCookie('user_id');
@@ -75,8 +108,23 @@ export class AuthController {
   @Public()
   @Post('send-password-reset-email')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send password reset email' })
+  @ApiOkResponse({ description: 'Password reset email sent successfully' })
   async sendPasswordResetEmail(@Req() req: RequestWithUser): Promise<void> {
     const { email } = req.body;
     await this.authService.sendPasswordResetEmail(email);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh JWT token' })
+  @ApiOkResponse({ description: 'Token refreshed successfully' })
+  @ApiUnauthorizedResponse({ description: 'Invalid refresh token' })
+  async refreshToken(
+    @Req() req: RequestWithUser,
+  ): Promise<{ accessToken: string }> {
+    const { refreshToken } = req.body;
+    const accessToken = await this.authService.refreshToken(refreshToken);
+    return { accessToken };
   }
 }

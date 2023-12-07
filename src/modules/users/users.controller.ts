@@ -18,6 +18,12 @@ import {
   ApiTags,
   ApiCreatedResponse,
   ApiBadRequestResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiParam,
+  ApiResponse,
+  ApiBody,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { User } from 'src/entities/user.entity';
 import { PaginatedResult } from 'src/interfaces/paginated-results.interface';
@@ -33,41 +39,72 @@ import {
 } from 'src/helpers/imageStorage';
 import { Public } from 'src/decorators/public.decorator';
 
-@ApiTags('users')
+@ApiTags('Users')
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // handle GET request to retrieve a paginated list of users
   @ApiCreatedResponse({ description: 'List all users.' })
   @ApiBadRequestResponse({ description: 'Error for list of users.' })
+  @ApiOperation({ summary: 'List all users.' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('page') page: number): Promise<PaginatedResult> {
     return this.usersService.paginate(page);
   }
 
-  // handle GET request to retrieve a user with a specific id
   @Get(':id')
   @Public()
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get user by id.' })
+  @ApiParam({ name: 'id', required: true, description: 'User id' })
+  @ApiBody({ type: User })
+  @ApiResponse({
+    status: 200,
+    description: 'User fetched successfully.',
+    type: User,
+  })
+  @ApiBadRequestResponse({ description: 'Error for get user by id.' })
   async findById(@Param('id') id: string): Promise<User> {
     return this.usersService.findById(id);
   }
 
-  // handle POST request to create a new user
   @ApiCreatedResponse({ description: 'Creates new user.' })
   @ApiBadRequestResponse({ description: 'Error for creating a new user.' })
+  @ApiOperation({ summary: 'Create new user.' })
+  @ApiResponse({
+    status: 201,
+    description: 'User created successfully.',
+    type: User,
+  })
+  @ApiBody({ type: CreateUserDto })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
-  // handle POST request to upload avatar image
   @Post('upload/:id')
   @UseInterceptors(FileInterceptor('avatar', saveImageToStorage))
+  @ApiOperation({ summary: 'Upload avatar image' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'User avatar',
+    type: 'multipart/form-data',
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponse({ status: 201, description: 'Avatar uploaded successfully.' })
   @HttpCode(HttpStatus.CREATED)
   async upload(
     @UploadedFile() file: Express.Multer.File, // Extract the uploaded file from the request
@@ -97,8 +134,16 @@ export class UsersController {
     throw new BadRequestException('File content does not match extension!'); // Throw a BadRequestException if the uploaded file does not have a safe file extension
   }
 
-  // handle PATCH request to update user information
   @Patch(':id')
+  @ApiOperation({ summary: 'Update user information.' })
+  @ApiParam({ name: 'id', required: true, description: 'User id' })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User updated successfully.',
+    type: User,
+  })
+  @ApiBadRequestResponse({ description: 'Error for update user information.' })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -107,8 +152,16 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
-  // handle DELETE request to delete a user with a specific id
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete user by id.' })
+  @ApiParam({ name: 'id', required: true, description: 'User id' })
+  @ApiBody({ type: User })
+  @ApiResponse({
+    status: 200,
+    description: 'User deleted successfully.',
+    type: User,
+  })
+  @ApiBadRequestResponse({ description: 'Error for delete user by id.' })
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<User> {
     return this.usersService.remove(id);

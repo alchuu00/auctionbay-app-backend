@@ -7,7 +7,7 @@ import { PaginatedResult } from 'src/interfaces/paginated-results.interface';
 import Logging from 'src/library/Logging';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-import path, { join } from 'path';
+import { join } from 'path';
 
 @Injectable()
 export abstract class AbstractService {

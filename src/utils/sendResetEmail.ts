@@ -5,6 +5,7 @@ import handlebars from 'handlebars';
 
 const sendResetEmail = async (email, subject, payload, template) => {
   try {
+    // Create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
       service: `${process.env.SMTP_SERVICE}`,
       host: `${process.env.SMTP_HOST}`,
@@ -19,6 +20,7 @@ const sendResetEmail = async (email, subject, payload, template) => {
       },
     });
 
+    // verify connection configuration
     transporter.verify(function (error, success) {
       if (error) {
         console.log(error);
@@ -28,9 +30,7 @@ const sendResetEmail = async (email, subject, payload, template) => {
     });
 
     console.log('Preparing to send email...');
-    console.log('Reading template file...');
     const filePath = path.join(__dirname, `../../src/utils/${template}`);
-    console.log('File path:', filePath);
     const source = fs.readFileSync(filePath, 'utf8');
     console.log('Compiling template...');
     const compiledTemplate = handlebars.compile(source);

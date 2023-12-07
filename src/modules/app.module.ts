@@ -34,7 +34,7 @@ import { NotificationsModule } from './notifications/notifications.module';
   controllers: [],
 })
 export class AppModule implements NestModule {
-  // Logger for console.log routes and urls
+  // logger middleware for console logging all requests to the server
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggerMiddleware)

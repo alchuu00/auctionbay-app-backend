@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { hash } from 'bcrypt';
@@ -79,5 +83,15 @@ export class AuthService {
       'resetPassword.handlebars',
     );
     return true;
+  }
+
+  async refreshToken(refreshToken: string): Promise<string> {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      const accessToken = this.generateJwt(payload.sub.id);
+      return accessToken;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }

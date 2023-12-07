@@ -19,6 +19,14 @@ import {
   ApiTags,
   ApiCreatedResponse,
   ApiBadRequestResponse,
+  ApiHeader,
+  ApiOperation,
+  ApiQuery,
+  ApiParam,
+  ApiBody,
+  ApiCookieAuth,
+  ApiResponse,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { parse } from 'cookie';
 import { saveImageToStorage } from 'src/helpers/imageStorage';
@@ -28,59 +36,90 @@ import { AuctionItem } from 'src/entities/auction_item.entity';
 import { CreateUpdateAuctionItemDto } from './dto/createUpdateAuctionItem.dto';
 import { Request } from 'express';
 
-@ApiTags('auctionItems')
+@ApiTags('Auction Items')
+@ApiHeader({
+  name: 'Authorization',
+  description: 'Bearer token for authentication',
+  required: true,
+})
 @Controller('auctionItems')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuctionItemsController {
   constructor(private readonly auctionItemsService: AuctionItemsService) {}
 
-  // handle GET request to retrieve a paginated list of auction items
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Retrieve a paginated list of auction items' })
+  @ApiQuery({ name: 'page', description: 'The page number for pagination' })
   async findAll(@Query('page') page: number): Promise<PaginatedResult> {
     return this.auctionItemsService.paginate(page);
   }
 
-  // handle GET request to retrieve auction items by a specific user
   @Get(':userId')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Retrieve auction items by a specific user' })
+  @ApiParam({ name: 'userId', description: 'The ID of the user' })
   async findByUser(@Param('userId') userId: string): Promise<AuctionItem[]> {
     return this.auctionItemsService.fetchByUser(userId);
   }
 
-  // handle GET request to retrieve auctions bidded on by a specific user
   @Get('bidded/:userId')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Retrieve auction items bidded on by a specific user',
+  })
+  @ApiParam({ name: 'userId', description: 'The ID of the user' })
   async findBidded(@Param('userId') userId: string): Promise<AuctionItem[]> {
     return this.auctionItemsService.findBidded(userId);
   }
 
-  // handle GET request to retrieve auctions won by a specific user
   @Get('/won/:userId')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Retrieve auction items won by a specific user',
+  })
+  @ApiParam({ name: 'userId', description: 'The ID of the user' })
   async findWon(@Param('userId') userId: string): Promise<AuctionItem[]> {
     return this.auctionItemsService.findWon(userId);
   }
 
-  // handle GET request to retrieve auctions currently winning by a specific user
   @Get('/winning/:userId')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Retrieve auction items currently winning by a specific user',
+  })
+  @ApiParam({ name: 'userId', description: 'The ID of the user' })
   async findWinning(@Param('userId') userId: string): Promise<AuctionItem[]> {
     return this.auctionItemsService.findWinning(userId);
   }
 
-  // handle GET request to retrieve an auction item with a specific id
   @Get('auction/:id')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Retrieve an auction item with specific ID',
+  })
+  @ApiParam({ name: 'id', description: 'The ID of the auction item' })
   async findOne(@Param('id') id: string): Promise<AuctionItem> {
     return this.auctionItemsService.findAuctionByAuctionId(id);
   }
 
-  // handle POST request to create a new auction item
-  @ApiCreatedResponse({ description: 'Creates new auction.' })
-  @ApiBadRequestResponse({ description: 'Error for creating a new auction.' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({
+    type: CreateUpdateAuctionItemDto,
+    description: 'The auction item details',
+  })
+  @ApiCookieAuth('user_id')
+  @ApiResponse({
+    status: 201,
+    description: 'The auction item has been successfully created.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    description: 'Create a new auction item',
+  })
   async create(
     @Body() createUpdateAuctionItemDto: CreateUpdateAuctionItemDto,
     @Req() req: Request,
@@ -91,10 +130,35 @@ export class AuctionItemsController {
     return this.auctionItemsService.create(createUpdateAuctionItemDto, userId);
   }
 
-  // handle POST request to upload auction item image
   @Post('upload/:id')
   @UseInterceptors(FileInterceptor('image', saveImageToStorage))
   @HttpCode(HttpStatus.CREATED)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'The file to upload',
+    type: 'multipart/form-data',
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiParam({ name: 'id', description: 'The ID of the auction item' })
+  @ApiResponse({
+    status: 201,
+    description: 'The image has been successfully uploaded.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @Post('upload/:id')
+  @UseInterceptors(FileInterceptor('image', saveImageToStorage))
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    description: 'Upload an image for an auction item',
+  })
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Param('id') auction_item_id: string,
@@ -105,9 +169,23 @@ export class AuctionItemsController {
     );
   }
 
-  // handle PATCH request to update auction item information
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiBody({
+    type: CreateUpdateAuctionItemDto,
+    description: 'The updated auction item details',
+  })
+  @ApiParam({ name: 'id', description: 'The ID of the auction item to update' })
+  @ApiResponse({
+    status: 200,
+    description: 'The auction item has been successfully updated.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Update an existing auction item',
+  })
   async update(
     @Param('id') id: string,
     @Body() createUpdateAuctionItemDto: CreateUpdateAuctionItemDto,
@@ -115,9 +193,19 @@ export class AuctionItemsController {
     return this.auctionItemsService.update(id, createUpdateAuctionItemDto);
   }
 
-  // handle DELETE request to delete an auction item with a specific id
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: 'id', description: 'The ID of the auction item to delete' })
+  @ApiResponse({
+    status: 200,
+    description: 'The auction item has been successfully deleted.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Delete an existing auction item',
+  })
   async remove(@Param('id') id: string): Promise<AuctionItem> {
     return this.auctionItemsService.remove(id);
   }

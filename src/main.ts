@@ -6,6 +6,7 @@ import express from 'express';
 
 import { AppModule } from './modules/app.module';
 import Logging from './library/Logging';
+import { AllExceptionsFilter } from './helpers/GlobalExceptionFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -20,6 +21,9 @@ async function bootstrap() {
   app.use(cookieParser());
   // Setup to serve static files
   app.use('/files', express.static('files'));
+
+  // Setup global filters
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Setup Swagger
   const config = new DocumentBuilder()

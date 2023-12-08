@@ -11,6 +11,7 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Subscribe to notifications' })
   @ApiResponse({ status: 200, description: 'Subscription successful.' })
   async subscribe(@Res() res: Response) {

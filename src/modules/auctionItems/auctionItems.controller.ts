@@ -17,8 +17,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
-  ApiCreatedResponse,
-  ApiBadRequestResponse,
   ApiHeader,
   ApiOperation,
   ApiQuery,
@@ -153,20 +151,18 @@ export class AuctionItemsController {
     description: 'The image has been successfully uploaded.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  @Post('upload/:id')
-  @UseInterceptors(FileInterceptor('image', saveImageToStorage))
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     description: 'Upload an image for an auction item',
   })
   async upload(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id') auction_item_id: string,
+    @Param('id') id: string,
+    @Req() req: Request,
   ): Promise<AuctionItem> {
-    return await this.auctionItemsService.handleFileUpload(
-      file,
-      auction_item_id,
-    );
+    console.log('Content-Type:', req.headers['content-type']);
+    console.log('file', file);
+    return await this.auctionItemsService.handleFileUpload(file, id);
   }
 
   @Patch(':id')

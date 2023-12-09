@@ -173,39 +173,44 @@ Here's an overview of the primary pages:
 
 ## Tools
 ### Frontend:
-HTML
-CSS
-Figma (Design tool)
-JavaScript
-TypeScript
-React (JavaScript library for building user interfaces)
+- HTML
+- CSS
+- Figma (Design tool)
+- JavaScript
+- TypeScript
+- React (JavaScript library for building user interfaces)
 
 ### Backend:
-Node.js (JavaScript runtime)
-NestJS (Framework for building efficient, scalable server-side applications)
-Express (Web application framework for Node.js)
+- Node.js (JavaScript runtime)
+- NestJS (Framework for building efficient, scalable server-side applications)
+- Express (Web application framework for Node.js)
+
+### API Documentation:
+- Swagger (API documentation and testing)
+
+![Alt text](readme_images/Screenshot_10.png)
 
 ### Containerization and Deployment:
-Docker (Platform for developing, shipping, and running applications in containers)
-AWS (Amazon Web Services, cloud computing platform)
+- Docker (Platform for developing, shipping, and running applications in containers)
+- AWS (Amazon Web Services, cloud computing platform)
 
 ### Version Control and Collaboration:
-Git (Version control system)
-GitHub (Web-based platform for version control and collaboration)
+- Git (Version control system)
+- GitHub (Web-based platform for version control and collaboration)
 
 ### Database:
-PostgreSQL (Relational database management system)
+- PostgreSQL (Relational database management system)
 
 ### ORM (Object-Relational Mapping):
-TypeORM (Database toolkit and ORM for Node.js and TypeScript)
+- TypeORM (Database toolkit and ORM for Node.js and TypeScript)
 
 ### Authentication:
-JSON Web Tokens (JWT, for secure authentication)
+- JSON Web Tokens (JWT, for secure authentication)
 
 ### API Testing:
-Postman (API development and testing tool)
+- Postman (API development and testing tool)
 
 ### Project Management:
-Trello (Project management tool for collaboration and task tracking)
+- Trello (Project management tool for collaboration and task tracking)
 
 ![Alt text](readme_images/Screenshot_6.png)

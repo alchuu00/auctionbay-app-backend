@@ -169,6 +169,25 @@ Here's an overview of the primary pages:
 - **Components:**
   - Form for entering auction details (title, description, images, start price, and end date).
 
+### 7. Reset Password Page
+
+- **Description** Enables users to reset their password securely.
+- **Components**
+  - Email Input Form Accepts the user's registered email.
+  - Submit Button Triggers the password reset process, sending a confirmation email.
+  - Confirmation Message Informs users that a password reset link has been emailed.
+
+### 8. Reset Password Confirmation Page
+
+- **Description** Allows users to set a new password after clicking the link in the confirmation email.
+- **Components**
+  - Password Reset Form Fields for entering and confirming a new password.
+  - Submit Button Updates the password based on a valid reset token.
+  - Success Message Confirms successful password reset.
+  - Login Link Directs users to the login page.
+  - Error Handling Provides clear messages for invalid or expired tokens.
+
+
  ![Alt text](readme_images/Screenshot_4.png)
 
 ## Tools

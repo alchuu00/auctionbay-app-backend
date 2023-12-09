@@ -188,7 +188,7 @@ Here's an overview of the primary pages:
 ### API Documentation:
 - Swagger (API documentation and testing)
 
-![Alt text](readme_images/Screenshot_10.png)
+![Alt text](readme_images/Screenshot_10.jpg)
 
 ### Containerization and Deployment:
 - Docker (Platform for developing, shipping, and running applications in containers)

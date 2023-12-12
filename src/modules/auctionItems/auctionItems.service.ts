@@ -47,6 +47,7 @@ export class AuctionItemsService extends AbstractService {
 
   async findWon(userId: string): Promise<AuctionItem[]> {
     const status = 'Winning';
+    const now = new Date().toISOString();
     try {
       const winnings = await this.auctionItemsRepository
         .createQueryBuilder()
@@ -55,7 +56,7 @@ export class AuctionItemsService extends AbstractService {
         .leftJoinAndSelect('auction_item.bids', 'bids')
         .where('bids.user_id = :userId', { userId })
         .andWhere('bids.status = :status', { status: status })
-        .andWhere('auction_item.end_date < :now', { now: new Date() })
+        .andWhere('auction_item.end_date < :now', { now: now })
         .getMany();
 
       return winnings;
@@ -68,7 +69,9 @@ export class AuctionItemsService extends AbstractService {
   }
 
   async findWinning(userId: string): Promise<AuctionItem[]> {
+
     const status = 'Winning';
+    const now = new Date().toISOString();
     try {
       const winnings = await this.auctionItemsRepository
         .createQueryBuilder()
@@ -77,7 +80,7 @@ export class AuctionItemsService extends AbstractService {
         .leftJoinAndSelect('auction_item.bids', 'bids')
         .where('bids.user_id = :userId', { userId })
         .andWhere('bids.status = :status', { status: status })
-        .andWhere('auction_item.end_date > :now', { now: new Date() })
+        .andWhere('auction_item.end_date > :now', { now: now })
         .getMany();
 
       return winnings;

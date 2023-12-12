@@ -20,7 +20,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     ConfigModule.forRoot({
       isGlobal: true,
       // which .env file it reads
-      envFilePath: [`vars/.env.${process.env.STAGE}`],
+      envFilePath: [`.env.${process.env.STAGE}`],
       validationSchema: configValidationSchema,
     }),
     DatabaseModule,

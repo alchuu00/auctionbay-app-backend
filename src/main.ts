@@ -14,7 +14,10 @@ async function bootstrap() {
   });
   // Enable CORS for the frontend to access the API
   app.enableCors({
-    origin: ['https://auctionbay.netlify.app'],
+    origin: [
+      'https://auctionbay.netlify.app',
+      'https://master--auctionbay.netlify.app',
+    ],
     credentials: true,
   });
   app.useGlobalPipes(new ValidationPipe());

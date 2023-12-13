@@ -1,9 +1,6 @@
 # AuctionBay WebApp
 
-*DISCLAIMER*
-*Deployment to AWS in progress. Stay tuned for live demo.*
-
-*until then the [front-end](https://github.com/alchuu00/auctionbay-app-frontend) is in a separate repository.*
+**Link:** https://auctionbay.netlify.app/
 
 ![Alt text](readme_images/Screenshot_7.png)
 

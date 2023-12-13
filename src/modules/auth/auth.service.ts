@@ -78,7 +78,7 @@ export class AuthService {
         name: user.first_name,
         id: user.id,
         token: token.token,
-        link: `http://localhost:3000/reset-password/${token.token}`,
+        link: `https://auctionbay.netlify.app/reset-password/${token.token}`,
       },
       'resetPassword.handlebars',
     );

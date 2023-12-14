@@ -60,7 +60,11 @@ export class AuthController {
   ): Promise<LoginResponse> {
     const newUser = await this.authService.register(body);
     const access_token = await this.authService.generateJwt(newUser);
-    res.cookie('access_token', access_token, { httpOnly: true });
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
     res.cookie('user_id', newUser.id);
     return { user: newUser, access_token };
   }

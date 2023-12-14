@@ -1,13 +1,10 @@
 # AuctionBay WebApp
 
-**Link:** https://auctionbay.netlify.app/
-
-**API Link:** https://auctionbay-backend.onrender.com/
-
 ![Alt text](readme_images/Screenshot_7.png)
 
 ## Table of Contents
 - [Overview](#overview)
+- [Accessing the Live Site](#accessing-the-live-site)
 - [Design](#design)
 - [Logic](#logic)
 - [Arhitecture](#arhitecture)
@@ -19,6 +16,27 @@
 
 ## Overview
 AuctionBay is an online auction platform that empowers users to create and manage auction events. Registered users can initiate auction events by providing essential details such as images, event titles, descriptions, starting prices, and durations. Bidders have the ability to actively participate in auctions, place bids, and track the status of their bids. Meanwhile, sellers can efficiently manage their auction events and access comprehensive bidding histories.
+
+## Accessing the Live Site
+
+To explore and interact with the live version of the project, follow these instructions:
+
+1. **Visit the Live Site:**
+   Open your web browser and navigate to the live site at [https://auctionbay.netlify.app/](https://auctionbay.netlify.app/).
+
+2. **Mock Credentials:**
+   Use the following mock credentials to log in and experience the site:
+   - **Email:** `john.doe@email.com`
+   - **Password:** `john123`
+
+3. **Exploring the Site:**
+   Using the mock credentials, thoroughly test the live website by creating, updating, and deleting auctions. Manage user profiles by editing details and uploading a new avatar. Engage in auction bidding, ensuring accurate recording of bids and verifying bidding history. Win a bid to confirm proper user marking upon auction completion.
+
+4. **Bug Reporting:**
+   If you encounter any issues or have feedback, please report them by [opening an issue](https://github.com/alchuu00/auctionbay-app-frontend/issues) in the project's repository.
+
+5. **Feedback:**
+   Feel free to share your thoughts and suggestions by reaching out through [alja.cekada@gmail.com](mailto:alja.cekada@gmail.com) or reach out to me on [Linkedin](https://www.linkedin.com/in/alja-cekada/).
 
 ## Design
 
@@ -207,6 +225,7 @@ Here's an overview of the primary pages:
 
 ### API Documentation:
 - Swagger (API documentation and testing)
+- **API Link:** https://auctionbay-backend.onrender.com/
 
 ![Alt text](readme_images/Screenshot_10.jpg)
 
